@@ -1,3 +1,4 @@
+
 "use client";
 import Link from "next/link";
 import {
@@ -7,7 +8,7 @@ import {
   ListTodo,
   Plus,
   Timer,
-  type LucideIcon,
+ main
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,12 +18,13 @@ import { TaskList } from "@/features/tasks/components/task-list";
 import { useTaskStats } from "@/features/tasks/hooks/use-tasks";
 export default function DashboardPage() {
   const { data, isLoading, isError } = useTaskStats();
-  const cards: { title: string; value: number; Icon: LucideIcon }[] = [
-    { title: "Total Tasks", value: data?.total ?? 0, Icon: ListTodo },
-    { title: "Completed", value: data?.completed ?? 0, Icon: CheckCircle2 },
-    { title: "Pending", value: data?.pending ?? 0, Icon: Timer },
-    { title: "High Priority", value: data?.highPriority ?? 0, Icon: Flame },
-    { title: "Upcoming", value: data?.upcoming ?? 0, Icon: CalendarClock },
+
+  const cards = [
+    ["Total Tasks", data?.total ?? 0, ListTodo],
+    ["Completed", data?.completed ?? 0, CheckCircle2],
+    ["Pending", data?.pending ?? 0, Timer],
+    ["High Priority", data?.highPriority ?? 0, Flame],
+    ["Upcoming", data?.upcoming ?? 0, CalendarClock],
   ];
   return (
     <section className="space-y-6">
@@ -42,10 +44,18 @@ export default function DashboardPage() {
       </div>
       {isError && <ErrorState message="Unable to load dashboard statistics." />}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+
         {cards.map(({ title, value, Icon }) => (
           <Card key={title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">{title}</CardTitle>
+
+        {cards.map(([title, value, Icon]) => (
+          <Card key={String(title)}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">
+                {title as string}
+              </CardTitle>
               <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -53,12 +63,16 @@ export default function DashboardPage() {
                 <Skeleton className="h-8 w-16" />
               ) : (
                 <div className="text-2xl font-bold">{value}</div>
+                <div className="text-2xl font-bold">{value as number}</div>
+
               )}
             </CardContent>
           </Card>
         ))}
       </div>
       <div>
+
+            <div>
         <h2 className="mb-3 text-xl font-semibold">Recent tasks</h2>
         <TaskList
           tasks={data?.recent}
@@ -69,3 +83,6 @@ export default function DashboardPage() {
     </section>
   );
 }
+
+
+

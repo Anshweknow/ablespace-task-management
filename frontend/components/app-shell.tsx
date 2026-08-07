@@ -10,17 +10,22 @@ import {
   User,
   type LucideIcon,
 } from "lucide-react";
+
+import { Menu, PanelLeft, ShieldCheck } from "lucide-react";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/features/theme/theme-switcher";
 import { useAuth } from "@/providers/auth-provider";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 const navItems: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: "/", label: "Dashboard", Icon: LayoutDashboard },
   { href: "/tasks", label: "Tasks", Icon: ListTodo },
   { href: "/profile", label: "Profile", Icon: User },
   { href: "/settings", label: "Settings", Icon: Settings },
 ];
+
 function Sidebar({ open }: { open: boolean }) {
   return (
     <aside
@@ -31,6 +36,7 @@ function Sidebar({ open }: { open: boolean }) {
         AbleSpace
       </Link>
       <nav className="mt-8 space-y-2 text-sm">
+
         {navItems.map(({ href, label, Icon }) => (
           <Link
             key={href}
@@ -41,6 +47,15 @@ function Sidebar({ open }: { open: boolean }) {
             {label}
           </Link>
         ))}
+
+        <div className="rounded-md bg-muted px-3 py-2 font-medium">
+          Workspace
+        </div>
+        <div className="px-3 py-2 text-muted-foreground">
+          Task features arrive in Prompt 2.
+        </div>
+
+
       </nav>
     </aside>
   );

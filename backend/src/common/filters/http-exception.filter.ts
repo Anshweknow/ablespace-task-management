@@ -22,11 +22,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getResponse()
         : { message: 'Internal server error' };
     if (status >= 500) this.logger.error(exception);
+
     res.status(status).json({
       statusCode: status,
       path: req.url,
       timestamp: new Date().toISOString(),
       error: response,
     });
+
   }
 }
