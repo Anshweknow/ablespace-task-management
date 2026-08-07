@@ -112,3 +112,31 @@ npm run dev
 ```
 
 The frontend is available at `http://localhost:3000`.
+## Task Management Features
+
+
+Authenticated users and guests can now manage their own tasks end-to-end:
+
+- Dashboard metrics for total, completed, pending, high-priority, upcoming, and recent tasks.
+- Task list with API-backed search, status filter, priority filter, due-date sorting, created-date sorting, and ascending/descending ordering.
+- Create, edit, delete, view details, duplicate, mark complete, and mark pending actions.
+- Responsive dashboard, task list, task detail, create/edit, profile, and settings pages.
+- Frontend state management uses TanStack Query with cache invalidation and optimistic delete updates.
+- Backend task APIs are protected by JWT auth and scoped per user.
+
+## Task API
+
+All endpoints require a bearer token:
+
+```text
+POST   /api/tasks
+GET    /api/tasks
+GET    /api/tasks/stats
+GET    /api/tasks/:id
+PATCH  /api/tasks/:id
+PATCH  /api/tasks/:id/complete
+PATCH  /api/tasks/:id/pending
+POST   /api/tasks/:id/duplicate
+DELETE /api/tasks/:id
+```
+
