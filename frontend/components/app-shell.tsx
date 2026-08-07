@@ -10,7 +10,9 @@ import {
   User,
   type LucideIcon,
 } from "lucide-react";
+
 import { Menu, PanelLeft, ShieldCheck } from "lucide-react";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/features/theme/theme-switcher";
@@ -52,6 +54,7 @@ function Sidebar({ open }: { open: boolean }) {
         <div className="px-3 py-2 text-muted-foreground">
           Task features arrive in Prompt 2.
         </div>
+
 
       </nav>
     </aside>

@@ -8,6 +8,7 @@ import {
   ListTodo,
   Plus,
   Timer,
+ main
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,7 @@ import { TaskList } from "@/features/tasks/components/task-list";
 import { useTaskStats } from "@/features/tasks/hooks/use-tasks";
 export default function DashboardPage() {
   const { data, isLoading, isError } = useTaskStats();
+
   const cards = [
     ["Total Tasks", data?.total ?? 0, ListTodo],
     ["Completed", data?.completed ?? 0, CheckCircle2],
@@ -42,6 +44,12 @@ export default function DashboardPage() {
       </div>
       {isError && <ErrorState message="Unable to load dashboard statistics." />}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+
+        {cards.map(({ title, value, Icon }) => (
+          <Card key={title}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{title}</CardTitle>
+
         {cards.map(([title, value, Icon]) => (
           <Card key={String(title)}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -54,12 +62,16 @@ export default function DashboardPage() {
               {isLoading ? (
                 <Skeleton className="h-8 w-16" />
               ) : (
+                <div className="text-2xl font-bold">{value}</div>
                 <div className="text-2xl font-bold">{value as number}</div>
+
               )}
             </CardContent>
           </Card>
         ))}
       </div>
+      <div>
+
             <div>
         <h2 className="mb-3 text-xl font-semibold">Recent tasks</h2>
         <TaskList
@@ -71,4 +83,6 @@ export default function DashboardPage() {
     </section>
   );
 }
+
+
 
