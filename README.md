@@ -112,8 +112,8 @@ npm run dev
 ```
 
 The frontend is available at `http://localhost:3000`.
-
 ## Task Management Features
+
 
 Authenticated users and guests can now manage their own tasks end-to-end:
 
@@ -139,3 +139,4 @@ PATCH  /api/tasks/:id/pending
 POST   /api/tasks/:id/duplicate
 DELETE /api/tasks/:id
 ```
+
