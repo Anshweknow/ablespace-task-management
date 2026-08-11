@@ -1,8 +1,24 @@
 -- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('USER', 'GUEST', 'ADMIN');
+
+-- CreateEnum
 CREATE TYPE "TaskStatus" AS ENUM ('PENDING', 'COMPLETED');
 
 -- CreateEnum
 CREATE TYPE "TaskPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Task" (
@@ -21,6 +37,9 @@ CREATE TABLE "Task" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
 CREATE INDEX "Task_userId_status_idx" ON "Task"("userId", "status");
 
 -- CreateIndex
@@ -34,3 +53,4 @@ CREATE INDEX "Task_userId_createdAt_idx" ON "Task"("userId", "createdAt");
 
 -- AddForeignKey
 ALTER TABLE "Task" ADD CONSTRAINT "Task_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
