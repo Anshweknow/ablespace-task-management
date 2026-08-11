@@ -28,6 +28,17 @@ export function useTaskStats() {
 export function useTaskMutations() {
   const qc = useQueryClient();
   const { toast } = useToast();
+  const errorToast = (error: unknown, fallback: string) => {
+    const message =
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof error.message === "string"
+        ? error.message
+        : fallback;
+
+    toast({ title: fallback, description: message, variant: "destructive" });
+  };
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: taskKeys.all });
   };
@@ -38,11 +49,16 @@ export function useTaskMutations() {
         invalidate();
         toast({ title: "Task created" });
       },
+      onError: (error) => errorToast(error, "Unable to create task"),
     }),
     update: useMutation({
       mutationFn: ({ id, data }: { id: string; data: Partial<Task> }) =>
         tasksApi.update(id, data),
-      onSuccess: invalidate,
+      onSuccess: () => {
+        invalidate();
+        toast({ title: "Task updated" });
+      },
+      onError: (error) => errorToast(error, "Unable to update task"),
     }),
     remove: useMutation({
       mutationFn: tasksApi.remove,
@@ -61,12 +77,14 @@ export function useTaskMutations() {
         );
         return { snapshots };
       },
-      onError: (_e, _id, ctx) =>
-        ctx?.snapshots.forEach(([key, data]) => qc.setQueryData(key, data)),
+      onError: (error, _id, ctx) => {
+        ctx?.snapshots.forEach(([key, data]) => qc.setQueryData(key, data));
+        errorToast(error, "Unable to delete task");
+      },
       onSettled: () => {
         invalidate();
-        toast({ title: "Task deleted" });
       },
+      onSuccess: () => toast({ title: "Task deleted" }),
     }),
     complete: useMutation({
       mutationFn: tasksApi.complete,
@@ -74,6 +92,7 @@ export function useTaskMutations() {
         invalidate();
         toast({ title: "Task completed" });
       },
+      onError: (error) => errorToast(error, "Unable to complete task"),
     }),
     pending: useMutation({
       mutationFn: tasksApi.pending,
@@ -81,6 +100,7 @@ export function useTaskMutations() {
         invalidate();
         toast({ title: "Task marked pending" });
       },
+      onError: (error) => errorToast(error, "Unable to mark task pending"),
     }),
     duplicate: useMutation({
       mutationFn: tasksApi.duplicate,
@@ -88,6 +108,7 @@ export function useTaskMutations() {
         invalidate();
         toast({ title: "Task duplicated" });
       },
+      onError: (error) => errorToast(error, "Unable to duplicate task"),
     }),
   };
 }

@@ -22,16 +22,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setLoading] = useState(true);
   const router = useRouter();
   useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null);
+      router.replace("/login");
+    };
+
+    window.addEventListener("ablespace:unauthorized", handleUnauthorized);
+
     if (!tokenStorage.get()) {
       setLoading(false);
-      return;
+      return () =>
+        window.removeEventListener(
+          "ablespace:unauthorized",
+          handleUnauthorized,
+        );
     }
+
     authApi
       .me()
       .then(setUser)
       .catch(() => tokenStorage.clear())
       .finally(() => setLoading(false));
-  }, []);
+
+    return () =>
+      window.removeEventListener("ablespace:unauthorized", handleUnauthorized);
+  }, [router]);
   const persist = (r: { accessToken: string; user: User }) => {
     tokenStorage.set(r.accessToken);
     setUser(r.user);

@@ -61,6 +61,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4000/api
 ```
 
 For production, set `NEXT_PUBLIC_API_URL` to the deployed backend API URL including the `/api` prefix.
+Production builds intentionally fail if this value is not configured, preventing a deployed frontend from accidentally calling a local backend URL.
 
 ### Backend (`backend/.env`)
 
@@ -72,7 +73,7 @@ PORT=4000
 FRONTEND_URL="http://localhost:3000"
 ```
 
-For production, set `FRONTEND_URL` to the deployed frontend origin, for example `https://ablespace-task-management.vercel.app`, and use a strong secret for `JWT_SECRET`.
+For production, set `FRONTEND_URL` to the deployed frontend origin, for example `https://ablespace-task-management.vercel.app`, and use a strong secret for `JWT_SECRET`. Multiple browser origins can be allowed with a comma-separated value such as `FRONTEND_URL="http://localhost:3000,https://ablespace-task-management.vercel.app"`.
 
 ## Installation
 

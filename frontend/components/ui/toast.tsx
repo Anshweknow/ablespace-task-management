@@ -16,10 +16,18 @@ export const ToastViewport = ({
 );
 export const Toast = ({
   className,
+  variant = "default",
   ...p
-}: React.ComponentProps<typeof ToastPrimitive.Root>) => (
+}: React.ComponentProps<typeof ToastPrimitive.Root> & {
+  variant?: "default" | "destructive";
+}) => (
   <ToastPrimitive.Root
-    className={cn("rounded-lg border bg-background p-4 shadow-lg", className)}
+    className={cn(
+      "rounded-lg border bg-background p-4 text-foreground shadow-lg",
+      variant === "destructive" &&
+        "border-destructive/40 bg-destructive text-destructive-foreground",
+      className,
+    )}
     {...p}
   />
 );

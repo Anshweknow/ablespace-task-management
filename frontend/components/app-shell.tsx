@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   ListTodo,
@@ -30,6 +31,8 @@ const navItems: {
 ];
 
 function Sidebar({ open }: { open: boolean }) {
+  const pathname = usePathname();
+
   return (
     <aside
       className={`${open ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 w-72 border-r bg-background p-4 transition-transform md:static md:translate-x-0`}
@@ -45,7 +48,11 @@ function Sidebar({ open }: { open: boolean }) {
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${
+                pathname === href || (href !== "/" && pathname.startsWith(href))
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
             >
               <Icon className="h-4 w-4" />
               {label}
@@ -61,11 +68,7 @@ function Sidebar({ open }: { open: boolean }) {
   );
 }
 
-export function AppShell({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
 
@@ -112,11 +115,7 @@ export function AppShell({
                     </AvatarFallback>
                   </Avatar>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={logout}
-                  >
+                  <Button variant="ghost" size="sm" onClick={logout}>
                     Logout
                   </Button>
                 </div>
