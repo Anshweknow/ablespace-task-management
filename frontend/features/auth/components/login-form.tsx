@@ -23,7 +23,7 @@ import {
   type LoginInput,
 } from "@/features/auth/schemas/auth.schemas";
 export function LoginForm() {
-  const { login, guestLogin } = useAuth();
+  const { login, guestLogin, isLoading } = useAuth();
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -36,7 +36,12 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(login)}>
+          <form
+            className="space-y-4"
+            onSubmit={form.handleSubmit(async (data) => {
+              await login(data);
+            })}
+          >
             <FormField
               control={form.control}
               name="email"
@@ -59,14 +64,21 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit">
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={form.formState.isSubmitting || isLoading}
+            >
               Login
             </Button>
             <Button
               className="w-full"
               type="button"
               variant="outline"
-              onClick={guestLogin}
+              disabled={form.formState.isSubmitting || isLoading}
+              onClick={() => {
+                void guestLogin();
+              }}
             >
               Continue as Guest
             </Button>
