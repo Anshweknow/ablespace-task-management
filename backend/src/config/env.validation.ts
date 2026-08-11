@@ -1,4 +1,4 @@
-import { plainToInstance } from 'class-transformer';
+import { plainToInstance, Type } from 'class-transformer';
 import {
   IsInt,
   IsNotEmpty,
@@ -11,7 +11,11 @@ class Env {
   @IsString() @IsNotEmpty() DATABASE_URL: string;
   @IsString() @IsNotEmpty() JWT_SECRET: string;
   @IsString() @IsOptional() JWT_EXPIRES_IN = '1d';
-  @IsInt() @Min(1) @IsOptional() PORT = 4000;
+  @Type(() => Number)
+@IsInt()
+@Min(1)
+@IsOptional()
+PORT = 4000;
   @IsString() @IsOptional() FRONTEND_URL = 'http://localhost:3000';
 }
 export function validate(config: Record<string, unknown>) {
