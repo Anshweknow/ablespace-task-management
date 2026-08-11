@@ -10,7 +10,9 @@ export class TasksRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   create(userId: string, dto: CreateTaskDto) {
-    return this.prisma.task.create({ data: this.mapPayload(userId, dto) });
+    return this.prisma.task.create({
+      data: this.mapCreatePayload(userId, dto),
+    });
   }
 
   findMany(userId: string, query: TaskQueryDto) {
@@ -27,7 +29,7 @@ export class TasksRepository {
   update(userId: string, id: string, dto: UpdateTaskDto) {
     return this.prisma.task.update({
       where: { id },
-      data: this.mapPayload(userId, dto, true),
+      data: this.mapUpdatePayload(dto),
     });
   }
 
@@ -106,16 +108,23 @@ export class TasksRepository {
       : { createdAt: direction };
   }
 
-  private mapPayload(
+  private mapCreatePayload(
     userId: string,
-    dto: CreateTaskDto | UpdateTaskDto,
-    partial = false,
-  ): Prisma.TaskUncheckedCreateInput | Prisma.TaskUncheckedUpdateInput {
-    const data:
-      | Prisma.TaskUncheckedCreateInput
-      | Prisma.TaskUncheckedUpdateInput = { ...dto };
-    if (dto.dueDate) data.dueDate = new Date(dto.dueDate);
-    if (!partial) (data as Prisma.TaskUncheckedCreateInput).userId = userId;
-    return data;
+    dto: CreateTaskDto,
+  ): Prisma.TaskUncheckedCreateInput {
+    return {
+      ...dto,
+      dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+      userId,
+    };
+  }
+
+  private mapUpdatePayload(
+    dto: UpdateTaskDto,
+  ): Prisma.TaskUncheckedUpdateInput {
+    return {
+      ...dto,
+      dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+    };
   }
 }
