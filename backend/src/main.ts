@@ -9,10 +9,16 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
+  const allowedOrigins = config
+    .get<string>('FRONTEND_URL', 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
   app.setGlobalPrefix('api');
   app.use(helmet());
   app.enableCors({
-    origin: config.get<string>('FRONTEND_URL', 'http://localhost:3000'),
+    origin: allowedOrigins,
     credentials: true,
   });
   app.useGlobalPipes(
@@ -27,7 +33,7 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('AbleSpace Task Management API')
     .setDescription(
-      'Foundation API for authentication and future task management features.',
+      'Production API for authentication and user-scoped task management.',
     )
     .setVersion('1.0')
     .addBearerAuth()

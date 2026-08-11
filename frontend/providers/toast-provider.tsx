@@ -15,7 +15,11 @@ import {
   ToastViewport,
 } from "@/components/ui/toast";
 
-type ToastInput = { title: string; description?: string };
+type ToastInput = {
+  title: string;
+  description?: string;
+  variant?: "default" | "destructive";
+};
 const ToastContext = createContext<
   { toast: (input: ToastInput) => void } | undefined
 >(undefined);
@@ -46,6 +50,7 @@ export function AppToastProvider({ children }: { children: React.ReactNode }) {
           <Toast
             key={item.id}
             open
+            variant={item.variant}
             onOpenChange={(open) => !open && dismiss(item.id)}
           >
             <ToastTitle>{item.title}</ToastTitle>

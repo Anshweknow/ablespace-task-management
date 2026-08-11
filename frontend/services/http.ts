@@ -12,5 +12,12 @@ http.interceptors.request.use((config) => {
 });
 http.interceptors.response.use(
   (r) => r,
-  (error) => Promise.reject(error.response?.data ?? error),
+  (error) => {
+    if (error.response?.status === 401 && typeof window !== "undefined") {
+      tokenStorage.clear();
+      window.dispatchEvent(new Event("ablespace:unauthorized"));
+    }
+
+    return Promise.reject(error.response?.data ?? error);
+  },
 );
