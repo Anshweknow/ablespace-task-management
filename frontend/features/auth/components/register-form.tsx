@@ -23,7 +23,7 @@ import {
   type RegisterInput,
 } from "@/features/auth/schemas/auth.schemas";
 export function RegisterForm() {
-  const { register } = useAuth();
+  const { register, isLoading } = useAuth();
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: { name: "", email: "", password: "" },
@@ -36,7 +36,12 @@ export function RegisterForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(register)}>
+          <form
+            className="space-y-4"
+            onSubmit={form.handleSubmit(async (data) => {
+              await register(data);
+            })}
+          >
             <FormField
               control={form.control}
               name="name"
@@ -70,7 +75,11 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit">
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={form.formState.isSubmitting || isLoading}
+            >
               Register
             </Button>
           </form>

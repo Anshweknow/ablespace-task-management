@@ -1,5 +1,12 @@
 "use client";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   authApi,
@@ -7,6 +14,7 @@ import {
   type RegisterPayload,
 } from "@/services/auth-api";
 import { tokenStorage } from "@/lib/token-storage";
+import { useToast } from "@/providers/toast-provider";
 import type { User } from "@/types/auth";
 interface AuthContextValue {
   user: User | null;
@@ -21,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setLoading] = useState(true);
   const router = useRouter();
+  const { toast } = useToast();
   useEffect(() => {
     const handleUnauthorized = () => {
       setUser(null);
@@ -47,19 +56,74 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () =>
       window.removeEventListener("ablespace:unauthorized", handleUnauthorized);
   }, [router]);
-  const persist = (r: { accessToken: string; user: User }) => {
-    tokenStorage.set(r.accessToken);
-    setUser(r.user);
-    router.push("/");
+  const getErrorMessage = (error: unknown, fallback: string) => {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof error.message === "string"
+    ) {
+      return error.message;
+    }
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "error" in error &&
+      typeof error.error === "object" &&
+      error.error !== null &&
+      "message" in error.error
+    ) {
+      const message = error.error.message;
+      return Array.isArray(message) ? message.join(", ") : String(message);
+    }
+
+    return fallback;
   };
+  const persist = useCallback(
+    (r: { accessToken: string; user: User }) => {
+      tokenStorage.set(r.accessToken);
+      setUser(r.user);
+      router.push("/");
+    },
+    [router],
+  );
+  const runAuthAction = useCallback(
+    async (
+      action: () => Promise<{ accessToken: string; user: User }>,
+      fallback: string,
+    ) => {
+      setLoading(true);
+      try {
+        persist(await action());
+      } catch (error) {
+        tokenStorage.clear();
+        setUser(null);
+        toast({
+          title: fallback,
+          description: getErrorMessage(error, fallback),
+          variant: "destructive",
+        });
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [persist, toast],
+  );
   const value = useMemo(
     () => ({
       user,
       isLoading,
-      login: async (p: LoginPayload) => persist(await authApi.login(p)),
+      login: async (p: LoginPayload) =>
+        runAuthAction(() => authApi.login(p), "Unable to sign in"),
       register: async (p: RegisterPayload) =>
-        persist(await authApi.register(p)),
-      guestLogin: async () => persist(await authApi.guestLogin()),
+        runAuthAction(() => authApi.register(p), "Unable to register"),
+      guestLogin: async () =>
+        runAuthAction(
+          () => authApi.guestLogin(),
+          "Unable to continue as guest",
+        ),
       logout: async () => {
         try {
           await authApi.logout();
@@ -70,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
     }),
-    [user, isLoading, router],
+    [user, isLoading, router, runAuthAction],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
